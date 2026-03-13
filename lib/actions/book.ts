@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { connectDB } from "../db/connect";
 import Book from "../models/book.model";
 import { extractText } from "unpdf";
@@ -13,6 +13,9 @@ import {
 import BookSegment from "../models/book-segment.model";
 import { UTApi } from "uploadthing/server";
 import { CreateBookValues } from "../zod";
+import { revalidatePath } from "next/cache";
+import { PlanLevel } from "../constants";
+import { checkPlanLimits } from "./session";
 
 const utapi = new UTApi();
 
@@ -90,6 +93,7 @@ export async function deleteBook(bookId: string) {
       deletedBook.coverBlobKey,
     ]);
 
+    revalidatePath("/dashboard/library");
     return {
       success: true,
       message: `Deleted: ${deletedBook.title}`,
@@ -106,13 +110,17 @@ export const createBook = async (values: CreateBookValues) => {
   let coverBlobKey = null;
 
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
 
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+    if (!user) throw new Error("Unauthorized");
 
     await connectDB();
+
+    const plan = (user.publicMetadata.plan as PlanLevel) || "free";
+    const limitCheck = await checkPlanLimits(user.id, plan);
+    if (!limitCheck.allowed) {
+      return { success: false, error: limitCheck.message };
+    }
 
     const response = await utapi.uploadFiles(values.pdfFile);
     if (!response.data) {
@@ -138,7 +146,7 @@ export const createBook = async (values: CreateBookValues) => {
     const book = await Book.create({
       title: values.title,
       author: values.author,
-      clerkId: userId,
+      clerkId: user.id,
       slug,
       fileURL,
       fileBlobKey,
@@ -147,6 +155,8 @@ export const createBook = async (values: CreateBookValues) => {
       fileSize: values.pdfFile.size,
       totalSegments: 0,
     });
+
+    revalidatePath("/dashboard/library");
 
     return {
       success: true,

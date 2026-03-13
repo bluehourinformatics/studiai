@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Phone, PhoneOff, User } from "lucide-react";
 import robotAvatar from "@/public/robot-avatar.png";
 import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import { endSession, startSession } from "@/lib/actions/session";
+import { toast } from "sonner";
 
 interface TranscriptEntry {
   role: "user" | "assistant";
@@ -21,6 +24,7 @@ interface Props {
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY!);
 
 export default function ChatPageClient({ book }: Props) {
+  const { user } = useUser();
   const [callStatus, setCallStatus] = useState<
     "inactive" | "connecting" | "active"
   >("inactive");
@@ -64,6 +68,9 @@ export default function ChatPageClient({ book }: Props) {
       setIsSpeaking(false);
       setVolumeLevel(0);
       setLiveTranscript(null);
+      if (sessionIdRef.current) {
+        endSession(sessionIdRef.current);
+      }
     });
 
     vapi.on("speech-start", () => setIsSpeaking(true));
@@ -84,6 +91,9 @@ export default function ChatPageClient({ book }: Props) {
     vapi.on("error", (err: any) => {
       console.error("Vapi error:", err);
       setCallStatus("inactive");
+      if (sessionIdRef.current) {
+        endSession(sessionIdRef.current);
+      }
     });
 
     return () => {
@@ -101,8 +111,15 @@ export default function ChatPageClient({ book }: Props) {
       setTranscripts([]);
 
       try {
+        const session = await startSession(book._id);
+        if (!session.success) {
+          toast.error(session.error);
+          return;
+        }
+        sessionIdRef.current = session.sessionId;
         await vapiRef.current.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID, {
           firstMessage,
+          maxDurationSeconds: session.maxDuration,
           variableValues: {
             title: book.title,
             bookId: book._id,
@@ -303,11 +320,21 @@ export default function ChatPageClient({ book }: Props) {
                     <div
                       className={`relative h-24 w-24 rounded-full overflow-hidden border-2 transition-colors ${!isSpeaking && callStatus === "active" ? "border-accent glow-accent" : "border-border"} bg-secondary flex items-center justify-center`}
                     >
-                      <User className="h-10 w-10 text-muted-foreground" />
+                      {user?.imageUrl ? (
+                        <Image
+                          src={user?.imageUrl}
+                          alt="profile url"
+                          width={100}
+                          height={100}
+                          className="h-24 w-24 rounded-full text-muted-foreground object-cover"
+                        />
+                      ) : (
+                        <User className="h-10 w-10 text-muted-foreground" />
+                      )}
                     </div>
                   </div>
                   <span className="text-xs font-medium text-muted-foreground">
-                    You
+                    {user?.firstName}
                   </span>
                 </div>
               </div>
