@@ -11,7 +11,6 @@ import {
   splitIntoSegments,
 } from "../utils";
 import BookSegment from "../models/book-segment.model";
-import mongoose from "mongoose";
 import { UTApi } from "uploadthing/server";
 import { CreateBookValues } from "../zod";
 
@@ -247,13 +246,13 @@ export const searchBookSegments = async (
 
     console.log(`Searching for: "${query}" in book ${bookId}`);
 
-    const bookObjectId = new mongoose.Types.ObjectId(bookId);
+    // const bookObjectId = new mongoose.Types.ObjectId(bookId);
 
     // Try MongoDB text search first (requires text index)
     let segments: Record<string, unknown>[] = [];
     try {
       segments = await BookSegment.find({
-        bookId: bookObjectId,
+        bookId: bookId,
         $text: { $search: query },
       })
         .select("_id bookId content segmentIndex pageNumber wordCount")
@@ -271,7 +270,7 @@ export const searchBookSegments = async (
       const pattern = keywords.map(escapeRegex).join("|");
 
       segments = await BookSegment.find({
-        bookId: bookObjectId,
+        bookId: bookId,
         content: { $regex: pattern, $options: "i" },
       })
         .select("_id bookId content segmentIndex pageNumber wordCount")
