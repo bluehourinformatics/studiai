@@ -91,29 +91,6 @@ export default function ChatPageClient({ book }: Props) {
     };
   }, [addTranscript]);
 
-  // async function handleSend(text = input): Promise<void> {
-  //   const trimmed = text.trim();
-  //   if (!trimmed || !sessionId || isLoading) return;
-  //   setInput("");
-  //   setError(null);
-  //   setMessages((prev) => [
-  //     ...prev,
-  //     { role: "user", content: trimmed, createdAt: new Date() },
-  //   ]);
-  //   setIsLoading(true);
-  //   try {
-  //     const { answer, sources } = await sendMessage(sessionId, trimmed);
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       { role: "assistant", content: answer, createdAt: new Date(), sources },
-  //     ]);
-  //   } catch (e: any) {
-  //     setError(e.message ?? "Something went wrong.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
-
   const firstMessage = `Hey, good to meet you. Quick question before we dive in - have you actually read ${book.title} yet, or are we starting fresh?`;
   const toggleCall = async () => {
     if (!vapiRef.current) return;
@@ -128,6 +105,7 @@ export default function ChatPageClient({ book }: Props) {
           firstMessage,
           variableValues: {
             title: book.title,
+            bookId: book._id,
           },
         });
       } catch (e) {
@@ -136,13 +114,6 @@ export default function ChatPageClient({ book }: Props) {
       }
     }
   };
-
-  // function toggleMute(
-  //   event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  // ): void {
-  //   vapi.setMuted(!isMuted);
-  //   setIsMuted((v) => !v);
-  // }
 
   return (
     <div className="flex flex-col h-[calc(100vh-7rem)]">
