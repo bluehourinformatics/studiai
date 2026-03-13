@@ -8,6 +8,7 @@ import {
   BarChart3,
   Upload,
   Settings,
+  Coffee,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,6 +18,7 @@ const navItems = [
   { title: "Overview", url: "/dashboard", icon: Home },
   { title: "Library", url: "/dashboard/library", icon: Library },
   { title: "Voice Chat", url: "/dashboard/chat", icon: MessageCircle },
+  { title: "Plans", url: "/dashboard/subscription", icon: Coffee },
   //   { title: "Quiz", url: "/dashboard/quiz", icon: Brain },
   //   { title: "Progress", url: "/dashboard/progress", icon: BarChart3 },
   { title: "Upload", url: "/dashboard/upload", icon: Upload },

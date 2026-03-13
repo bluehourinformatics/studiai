@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Lora, IBM_Plex_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/ui/themes";
 
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -38,7 +40,18 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased dark`}
       >
         <TooltipProvider>
-          <ClerkProvider>{children}</ClerkProvider>
+          <ClerkProvider
+            appearance={{
+              theme: dark,
+              variables: {
+                colorPrimary: "var(--primary)",
+                colorPrimaryForeground: "var(--primary-foreground)",
+              },
+            }}
+          >
+            {children}
+            <Toaster richColors position="top-right" />
+          </ClerkProvider>
         </TooltipProvider>
       </body>
     </html>

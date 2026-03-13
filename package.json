@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.0.1",
+    "@clerk/ui": "^1.2.1",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@vapi-ai/web": "^2.5.2",
@@ -32,6 +33,7 @@
     "tailwind-merge": "^3.5.0",
     "unpdf": "^1.4.0",
     "uploadthing": "^7.7.4",
+    "use-debounce": "^10.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

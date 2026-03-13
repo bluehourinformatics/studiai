@@ -1,115 +1,47 @@
 import DashboardLibraryClient from "@/components/dashboard/dashboard-library-client";
+import BookList from "@/components/dashboard/library/book-list";
+import BookListSkeleton from "@/components/dashboard/library/book-list-skeleton";
+import { Button } from "@/components/ui/button";
 import { getAllBooks } from "@/lib/actions/book";
+import { Upload } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 
-const books: any = [
-  {
-    clerkId: "1",
-    title: "Introduction to Machine Learning",
-    subject: "CS",
-    pages: 420,
-    progress: 72,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-  {
-    clerkId: "2",
-    title: "Organic Chemistry Fundamentals",
-    subject: "Chemistry",
-    pages: 380,
-    progress: 45,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-  {
-    clerkId: "3",
-    title: "Modern Physics Vol. 2",
-    subject: "Physics",
-    pages: 290,
-    progress: 18,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-  {
-    clerkId: "4",
-    title: "Calculus: Early Transcendentals",
-    subject: "Math",
-    pages: 560,
-    progress: 90,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-  {
-    clerkId: "5",
-    title: "Data Structures & Algorithms",
-    subject: "CS",
-    pages: 350,
-    progress: 60,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-  {
-    clerkId: "6",
-    title: "Linear Algebra Done Right",
-    subject: "Math",
-    pages: 260,
-    progress: 30,
-    uploadedAt: new Date("2025-01-15"),
-    slug: "",
-    author: "",
-    fileUrl: "",
-    fileBlobKey: "",
-    coverUrl: "",
-    coverBlobKey: "",
-    fileSize: 0,
-    totalSegments: 0,
-    updatedAt: new Date("2025-01-15"),
-  },
-];
+export default async function DashboardLibraryPage(props: {
+  searchParams?: Promise<{ search: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const search = searchParams?.search;
 
-export default async function DashboardLibraryPage() {
-  const { success, data: books } = await getAllBooks();
-  if (books?.length === 0) return null;
+  return (
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold font-display">My Library</h1>
+          <p className="text-muted-foreground mt-1">
+            The book management page.
+          </p>
+        </div>
+        <Link href={"/dashboard/upload"}>
+          <Button className="gap-2">
+            <Upload className="h-4 w-4" /> Upload PDF
+          </Button>
+        </Link>
+      </div>
+      <BookTable search={search} />
+    </div>
+  );
+}
 
-  // console.log(books);
-  return <DashboardLibraryClient books={books} />;
+async function BookTable({ search }: { search?: string }) {
+  const { success, data: books } = await getAllBooks(search);
+  if (!success) {
+    throw new Error("Failed to fetch books");
+  }
+
+  return (
+    <Suspense key={books?.length} fallback={<BookListSkeleton />}>
+      <BookList books={books!} />
+    </Suspense>
+  );
 }
