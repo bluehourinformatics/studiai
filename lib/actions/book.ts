@@ -16,6 +16,7 @@ import { CreateBookValues } from "../zod";
 import { revalidatePath } from "next/cache";
 import { PlanLevel } from "../constants";
 import { checkPlanLimits } from "./session";
+import { TextSegment } from "../types";
 
 const utapi = new UTApi();
 
@@ -181,6 +182,10 @@ export const createBook = async (values: CreateBookValues) => {
 
 export const getBookBySlug = async (slug: string) => {
   try {
+    const user = await currentUser();
+
+    if (!user) throw new Error("Unauthorized");
+
     await connectDB();
 
     const book = await Book.findOne({ slug }).lean();
@@ -202,22 +207,20 @@ export const getBookBySlug = async (slug: string) => {
   }
 };
 
-export const saveBookSegments = async (bookId: string, pdfFile: File) => {
+export const saveBookSegments = async (
+  bookId: string,
+  segments: TextSegment[],
+) => {
   try {
-    const { userId: clerkId } = await auth();
+    const user = await currentUser();
 
-    if (!clerkId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    const { totalPages, text } = await extractTextFromPDF(pdfFile);
-    const segments = splitIntoSegments(text);
+    if (!user) throw new Error("Unauthorized");
 
     await connectDB();
 
     const segmentsToInsert = segments.map(
       ({ text, segmentIndex, pageNumber, wordCount }) => ({
-        clerkId,
+        clerkId: user.id,
         bookId,
         content: text,
         segmentIndex,
@@ -229,7 +232,6 @@ export const saveBookSegments = async (bookId: string, pdfFile: File) => {
     await BookSegment.insertMany(segmentsToInsert);
     await Book.findByIdAndUpdate(bookId, {
       totalSegments: segments.length,
-      pages: totalPages,
     });
 
     return {

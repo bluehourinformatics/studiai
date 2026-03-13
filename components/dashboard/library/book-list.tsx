@@ -2,33 +2,26 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useDebouncedCallback } from "use-debounce";
 import {
   BookOpen,
   Search,
   Grid3X3,
   List,
   MoreVertical,
-  Upload,
   MessageSquare,
   Trash2,
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { DeleteDialog } from "../delete-dialog";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { deleteBook } from "@/lib/actions/book";
 import { toast } from "sonner";
 import {
@@ -40,26 +33,46 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import Image from "next/image";
+import { IBook } from "@/lib/types";
 
-export default function DashboardLibraryClient({ books }: { books: any }) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [search, setSearch] = useState("");
-  const [deletingBookId, setDeletingBookId] = useState();
-  const [open, setOpen] = useState(false);
+type BookListProps = {
+  books: IBook[];
+};
+
+export default function BookList({ books }: BookListProps) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
 
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [deletingBookId, setDeletingBookId] = useState();
+  const [open, setOpen] = useState(false);
+
+  const handleSearch = useDebouncedCallback((search: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (search) {
+      params.set("search", search);
+    } else {
+      params.delete("search");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  }, 300);
+
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search books..."
             className="pl-9 bg-muted/50 border-border/50"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            defaultValue={searchParams.get("search")?.toString()}
+            onChange={(e) => {
+              handleSearch(e.target.value);
+            }}
           />
         </div>
         <div className="flex items-center gap-1 border border-border/50 rounded-lg p-0.5">
@@ -161,11 +174,11 @@ export default function DashboardLibraryClient({ books }: { books: any }) {
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   {/* <Badge
-                    variant="outline"
-                    className={`text-xs ${subjectColors[book.subject] || ""}`}
-                  >
-                    {book.author}
-                  </Badge> */}
+                      variant="outline"
+                      className={`text-xs ${subjectColors[book.subject] || ""}`}
+                    >
+                      {book.author}
+                    </Badge> */}
                   <span className="text-xs text-muted-foreground">
                     {book.author}
                   </span>
