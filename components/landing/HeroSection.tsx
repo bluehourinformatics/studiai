@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Mic, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroBook from "@/public/hero-book.png";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -47,9 +47,11 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button size="lg" className="gap-2 text-base">
-              Start Learning Free <ArrowRight className="h-4 w-4" />
-            </Button>
+            <Link href={"/sign-up"}>
+              <Button size="lg" className="gap-2 text-base">
+                Start Learning Free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
             <Button
               size="lg"
               variant="outline"
@@ -81,7 +83,7 @@ const HeroSection = () => {
             <div className="w-72 h-72 rounded-full bg-primary/10 blur-[80px]" />
           </div>
           <img
-            src={"hero-book.png"}
+            src={"hero-removebg-preview.png"}
             alt="AI-powered book with glowing particles"
             className="relative z-10 w-full max-w-md lg:max-w-lg drop-shadow-2xl"
           />

@@ -118,6 +118,7 @@ export const createBook = async (values: CreateBookValues) => {
     await connectDB();
 
     const plan = (user.publicMetadata.plan as PlanLevel) || "free";
+    console.log("plan: ", plan);
     const limitCheck = await checkPlanLimits(user.id, plan);
     if (!limitCheck.allowed) {
       return { success: false, error: limitCheck.message };

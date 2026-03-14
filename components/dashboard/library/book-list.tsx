@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Trash2,
   Edit,
+  Upload,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +55,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type BookListProps = {
   books: IBook[];
@@ -120,106 +123,127 @@ export default function BookList({ books }: BookListProps) {
             : "space-y-3"
         }
       >
-        {books.map((book: any) => (
-          <Card
-            key={book.slug}
-            className="glass border-border/50 hover:border-primary/30 transition-all cursor-pointer group"
-            onClick={() => router.push(`/dashboard/chat/${book.slug}`)}
-          >
-            <CardContent
-              className={
-                viewMode === "grid" ? "p-5" : "p-4 flex items-center gap-4"
-              }
+        {books.length > 0 ? (
+          books.map((book: any) => (
+            <Card
+              key={book.slug}
+              className="glass border-border/50 hover:border-primary/30 transition-all cursor-pointer group"
+              onClick={() => router.push(`/dashboard/chat/${book.slug}`)}
             >
-              <div
-                className={`relative overflow-hidden rounded-md bg-muted flex items-center justify-center shrink-0 ${
-                  viewMode === "grid"
-                    ? "h-48 w-full mb-4" // Increased height for better book proportions
-                    : "h-36 w-24"
-                }`}
+              <CardContent
+                className={
+                  viewMode === "grid" ? "p-5" : "p-4 flex items-center gap-4"
+                }
               >
-                {book.coverURL ? (
-                  <Image
-                    src={book.coverURL}
-                    alt={book.title}
-                    fill
-                    className="object-fill transition-transform group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                ) : (
-                  <BookOpen
-                    className={
-                      viewMode === "grid"
-                        ? "h-10 w-10 text-primary/40"
-                        : "h-4 w-4 text-primary"
-                    }
-                  />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-medium text-sm truncate">{book.title}</h3>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setEditingBook(book);
-                          setOpenEditDialog(true);
-                        }}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Book
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setDeletingBookId(book._id);
-                          setOpen(true);
-                        }}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <div
+                  className={`relative overflow-hidden rounded-md bg-muted flex items-center justify-center shrink-0 ${
+                    viewMode === "grid"
+                      ? "h-48 w-full mb-4" // Increased height for better book proportions
+                      : "h-36 w-24"
+                  }`}
+                >
+                  {book.coverURL ? (
+                    <Image
+                      src={book.coverURL}
+                      alt={book.title}
+                      fill
+                      className="object-fill transition-transform group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <BookOpen
+                      className={
+                        viewMode === "grid"
+                          ? "h-10 w-10 text-primary/40"
+                          : "h-4 w-4 text-primary"
+                      }
+                    />
+                  )}
                 </div>
-                <div className="flex items-center gap-2 mt-2">
-                  {/* <Badge
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-medium text-sm truncate">
+                      {book.title}
+                    </h3>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        asChild
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                          <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setEditingBook(book);
+                            setOpenEditDialog(true);
+                          }}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit Book
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setDeletingBookId(book._id);
+                            setOpen(true);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    {/* <Badge
                       variant="outline"
                       className={`text-xs ${subjectColors[book.subject] || ""}`}
                     >
                       {book.author}
                     </Badge> */}
-                  <span className="text-xs text-muted-foreground">
-                    {book.author}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {book.pages} pages
-                  </span>
-                </div>
-                {/* <div className="flex items-center justify-between gap-2 mt-6">
+                    <span className="text-xs text-muted-foreground">
+                      {book.author}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {book.pages} pages
+                    </span>
+                  </div>
+                  {/* <div className="flex items-center justify-between gap-2 mt-6">
                   <Progress value={book.progress} className="h-1.5 flex-1" />
                   <span className="text-xs text-muted-foreground">
                     {book.progress}%
                   </span>
                 </div> */}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-border/50 rounded-xl bg-muted/20">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
+              <BookOpen className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium">No books found</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+              Your library is empty. Upload a PDF to start chatting with your
+              documents.
+            </p>
+            <Link href="/dashboard/upload">
+              <Button className="gap-2">
+                <Upload className="h-4 w-4" />
+                Upload your first book
+              </Button>
+            </Link>
+          </div>
+        )}
       </motion.div>
       {deletingBookId && (
         <AlertDialog open={open} onOpenChange={setOpen}>

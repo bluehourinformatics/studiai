@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const CTASection = () => {
   return (
@@ -24,9 +25,12 @@ const CTASection = () => {
               Join thousands of students who are learning faster with AI-powered
               voice conversations.
             </p>
-            <Button size="lg" className="gap-2 text-base">
-              Get Started Free <ArrowRight className="h-4 w-4" />
-            </Button>
+            <Link href={"/sign-up"}>
+              <Button size="lg" className="gap-2 text-base">
+                Get Started Free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+
             <p className="text-xs text-muted-foreground mt-4">
               No credit card required
             </p>
