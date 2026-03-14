@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Mic, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroBook from "@/public/hero-book.png";
 
 const HeroSection = () => {
   return (
@@ -81,7 +80,7 @@ const HeroSection = () => {
             <div className="w-72 h-72 rounded-full bg-primary/10 blur-[80px]" />
           </div>
           <img
-            src={"hero-book.png"}
+            src={"hero-removebg-preview.png"}
             alt="AI-powered book with glowing particles"
             className="relative z-10 w-full max-w-md lg:max-w-lg drop-shadow-2xl"
           />
