@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Mic, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -46,9 +47,11 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button size="lg" className="gap-2 text-base">
-              Start Learning Free <ArrowRight className="h-4 w-4" />
-            </Button>
+            <Link href={"/sign-up"}>
+              <Button size="lg" className="gap-2 text-base">
+                Start Learning Free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
             <Button
               size="lg"
               variant="outline"

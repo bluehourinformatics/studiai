@@ -124,7 +124,7 @@ export default function UploadForm() {
       setUploadProgress(100);
       setUploadStage("done");
       toast.success("Book created successfully!");
-      router.push("/dashboard/library");
+      router.push("/dashboard");
     } catch (error) {
       toast.error("Upload failed");
     }

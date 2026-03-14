@@ -2,6 +2,8 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const tiers = [
   {
@@ -29,7 +31,7 @@ const tiers = [
       "Up to 15 minutes per session",
       "Session history",
     ],
-    cta: "Start Pro Trial",
+    cta: "Subscribe Now",
     featured: true,
   },
   {
@@ -43,7 +45,7 @@ const tiers = [
       "Up to 60 minutes per session",
       "Session history",
     ],
-    cta: "Contact Sales",
+    cta: "Upgrade to Pro",
     featured: false,
   },
 ];
@@ -59,6 +61,20 @@ const item = {
 };
 
 const PricingSection = () => {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
+
+  function handleSubscription(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void {
+    if (isSignedIn) {
+      router.push("/dashboard/subscription");
+      return;
+    } else {
+      router.push("/sign-up");
+    }
+  }
+
   return (
     <section id="pricing" className="relative py-24 lg:py-32">
       <div className="container mx-auto px-6">
@@ -133,6 +149,7 @@ const PricingSection = () => {
                 className="w-full"
                 variant={tier.featured ? "default" : "outline"}
                 size="lg"
+                onClick={handleSubscription}
               >
                 {tier.cta}
               </Button>
