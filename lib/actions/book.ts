@@ -12,7 +12,7 @@ import {
 } from "../utils";
 import BookSegment from "../models/book-segment.model";
 import { UTApi } from "uploadthing/server";
-import { CreateBookValues } from "../zod";
+import { CreateBookValues, EditBookValues } from "../zod";
 import { revalidatePath } from "next/cache";
 import { PlanLevel } from "../constants";
 import { checkPlanLimits } from "./session";
@@ -94,7 +94,7 @@ export async function deleteBook(bookId: string) {
       deletedBook.coverBlobKey,
     ]);
 
-    revalidatePath("/dashboard/library");
+    revalidatePath("/dashboard");
     return {
       success: true,
       message: `Deleted: ${deletedBook.title}`,
@@ -157,7 +157,7 @@ export const createBook = async (values: CreateBookValues) => {
       totalSegments: 0,
     });
 
-    revalidatePath("/dashboard/library");
+    revalidatePath("/dashboard");
 
     return {
       success: true,
@@ -177,6 +177,23 @@ export const createBook = async (values: CreateBookValues) => {
       success: false,
       error,
     };
+  }
+};
+
+export const updateBook = async (bookId: string, values: EditBookValues) => {
+  try {
+    await connectDB();
+    const updateBook = await Book.findByIdAndUpdate(bookId, {
+      title: values.title,
+      author: values.author,
+    });
+
+    revalidatePath("/dashboard");
+
+    return { success: true, updateBook: serializeData(updateBook) };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: "Boof not found." };
   }
 };
 
