@@ -1,4 +1,3 @@
-import DashboardLibraryClient from "@/components/dashboard/dashboard-library-client";
 import BookList from "@/components/dashboard/library/book-list";
 import BookListSkeleton from "@/components/dashboard/library/book-list-skeleton";
 import { Button } from "@/components/ui/button";
@@ -17,10 +16,10 @@ export default async function DashboardLibraryPage(props: {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display">My Library</h1>
-          <p className="text-muted-foreground mt-1">
-            The book management page.
-          </p>
+          <h1 className="text-2xl font-bold font-display">
+            Welcome back, Student 👋
+          </h1>
+          <p className="text-muted-foreground mt-1">Here's your books.</p>
         </div>
         <Link href={"/dashboard/upload"}>
           <Button className="gap-2">

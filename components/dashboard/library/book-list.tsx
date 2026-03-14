@@ -11,6 +11,7 @@ import {
   MoreVertical,
   MessageSquare,
   Trash2,
+  Edit,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -36,6 +37,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 import { IBook } from "@/lib/types";
+import { EditBookDialog } from "./edit-book-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 type BookListProps = {
   books: IBook[];
@@ -49,6 +67,8 @@ export default function BookList({ books }: BookListProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deletingBookId, setDeletingBookId] = useState();
   const [open, setOpen] = useState(false);
+  const [editingBook, setEditingBook] = useState<IBook | null>(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   const handleSearch = useDebouncedCallback((search: string) => {
     const params = new URLSearchParams(searchParams);
@@ -112,25 +132,25 @@ export default function BookList({ books }: BookListProps) {
               }
             >
               <div
-                className={`rounded-lg bg-primary/10 flex items-center justify-center shrink-0 ${viewMode === "grid" ? "h-28 w-full mb-4" : "h-12 w-9"}`}
+                className={`relative overflow-hidden rounded-md bg-muted flex items-center justify-center shrink-0 ${
+                  viewMode === "grid"
+                    ? "h-48 w-full mb-4" // Increased height for better book proportions
+                    : "h-36 w-24"
+                }`}
               >
                 {book.coverURL ? (
                   <Image
                     src={book.coverURL}
-                    alt="cover"
-                    width={48}
-                    height={36}
-                    className={
-                      viewMode === "grid"
-                        ? "h-8 w-8 text-primary object-cover"
-                        : "h-4 w-4 text-primary"
-                    }
+                    alt={book.title}
+                    fill
+                    className="object-fill transition-transform group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (
                   <BookOpen
                     className={
                       viewMode === "grid"
-                        ? "h-8 w-8 text-primary"
+                        ? "h-10 w-10 text-primary/40"
                         : "h-4 w-4 text-primary"
                     }
                   />
@@ -153,11 +173,14 @@ export default function BookList({ books }: BookListProps) {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <DropdownMenuItem
-                        onClick={() =>
-                          router.push(`/dashboard/chat/${book.slug}`)
-                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditingBook(book);
+                          setOpenEditDialog(true);
+                        }}
                       >
-                        <MessageSquare className="h-4 w-4 mr-2" /> Open Chat
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Book
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => {
@@ -167,7 +190,8 @@ export default function BookList({ books }: BookListProps) {
                         }}
                         className="text-destructive focus:text-destructive"
                       >
-                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                        <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                        Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -186,12 +210,12 @@ export default function BookList({ books }: BookListProps) {
                     {book.pages} pages
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-2 mt-6">
+                {/* <div className="flex items-center justify-between gap-2 mt-6">
                   <Progress value={book.progress} className="h-1.5 flex-1" />
                   <span className="text-xs text-muted-foreground">
                     {book.progress}%
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardContent>
           </Card>
@@ -225,6 +249,16 @@ export default function BookList({ books }: BookListProps) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      )}
+      {editingBook && (
+        <EditBookDialog
+          book={editingBook}
+          open={openEditDialog}
+          setOpen={(value) => {
+            value ?? setEditingBook(null);
+            setOpenEditDialog(value);
+          }}
+        />
       )}
     </div>
   );

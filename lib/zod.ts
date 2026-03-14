@@ -35,3 +35,10 @@ export const createBookSchema = z.object({
 });
 
 export type CreateBookValues = z.infer<typeof createBookSchema>;
+
+export const editBookSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  author: z.string().min(1, "Author is required"),
+});
+
+export type EditBookValues = z.infer<typeof editBookSchema>;
