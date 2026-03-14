@@ -1,6 +1,4 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { UserButton } from "@clerk/nextjs";
 import React from "react";
 
