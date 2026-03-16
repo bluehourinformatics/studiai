@@ -125,8 +125,9 @@ export const createBook = async (values: CreateBookValues) => {
     }
 
     const response = await utapi.uploadFiles(values.pdfFile);
-    if (!response.data) {
-      return { success: false, error: "Upload failed" };
+    if (response.error) {
+      console.error("UTAPI Error Detail:", response.error); // This will show in Vercel Logs
+      return { success: false, error: response.error.message };
     }
 
     fileURL = response.data.ufsUrl;
@@ -134,8 +135,9 @@ export const createBook = async (values: CreateBookValues) => {
 
     if (values.coverFile) {
       const coverResp = await utapi.uploadFiles(values.coverFile);
-      if (!coverResp.data) {
-        return { success: false, error: "Upload failed" };
+      if (coverResp.error) {
+        console.error("UTAPI Error Detail:", coverResp.error); // This will show in Vercel Logs
+        return { success: false, error: coverResp.error.message };
       }
 
       coverURL = coverResp.data.ufsUrl;
