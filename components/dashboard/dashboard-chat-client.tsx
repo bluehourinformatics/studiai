@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { endSession, startSession } from "@/lib/actions/session";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface TranscriptEntry {
   role: "user" | "assistant";
@@ -40,6 +41,7 @@ export default function ChatPageClient({ book }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   // Keep sessionId accessible inside VAPI event callbacks without stale closure
   const sessionIdRef = useRef<string | null>(null);
+  const router = useRouter();
 
   const addTranscript = useCallback(
     (role: "user" | "assistant", content: string) => {
@@ -114,6 +116,7 @@ export default function ChatPageClient({ book }: Props) {
         const session = await startSession(book._id);
         if (!session.success) {
           toast.error(session.error);
+          router.refresh();
           return;
         }
         sessionIdRef.current = session.sessionId;

@@ -78,18 +78,6 @@ export async function checkPlanLimits(clerkId: string, plan: PlanLevel) {
     return { allowed: true };
   }
 
-  const bookCount = await Book.countDocuments({
-    clerkId,
-  });
-
-  if (bookCount >= config.maxBooks) {
-    console.error("Max books reached....");
-    return {
-      allowed: false,
-      message: `Monthly limit reached (${config.maxBooks} books). Please upgrade your plan.`,
-    };
-  }
-
   // 2. Aggregate current month's sessions
   const now = new Date();
   const billingPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -104,6 +92,29 @@ export async function checkPlanLimits(clerkId: string, plan: PlanLevel) {
     return {
       allowed: false,
       message: `Monthly limit reached (${config.maxSessionsPerMonth} sessions). Please upgrade your plan.`,
+    };
+  }
+
+  return { allowed: true };
+}
+
+export async function checkPlanBookLimits(clerkId: string, plan: PlanLevel) {
+  const config = PLAN_CONFIG[plan];
+
+  // 1. Unlimited check
+  if (config.maxSessionsPerMonth === Infinity) {
+    return { allowed: true };
+  }
+
+  const bookCount = await Book.countDocuments({
+    clerkId,
+  });
+
+  if (bookCount >= config.maxBooks) {
+    console.error("Max books reached....");
+    return {
+      allowed: false,
+      message: `Monthly limit reached (${config.maxBooks} books). Please upgrade your plan.`,
     };
   }
 
