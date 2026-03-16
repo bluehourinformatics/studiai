@@ -20,7 +20,7 @@ import { TextSegment } from "../types";
 
 const utapi = new UTApi();
 
-export const getAllBooks = async (search?: string) => {
+export const getAllBooks = async (userId: string, search?: string) => {
   try {
     await connectDB();
 
