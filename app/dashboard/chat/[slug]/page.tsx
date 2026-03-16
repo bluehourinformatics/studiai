@@ -9,6 +9,7 @@ export default async function ChatPage({
   const { slug } = await params;
 
   const { data: book } = await getBookBySlug(slug);
+
   // console.log(slug);
 
   return (

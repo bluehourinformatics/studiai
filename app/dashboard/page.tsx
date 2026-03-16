@@ -2,8 +2,10 @@ import BookList from "@/components/dashboard/library/book-list";
 import BookListSkeleton from "@/components/dashboard/library/book-list-skeleton";
 import { Button } from "@/components/ui/button";
 import { getAllBooks } from "@/lib/actions/book";
+import { auth } from "@clerk/nextjs/server";
 import { Upload } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export default async function DashboardHomePage(props: {
@@ -11,6 +13,9 @@ export default async function DashboardHomePage(props: {
 }) {
   const searchParams = await props.searchParams;
   const search = searchParams?.search;
+  const { userId } = await auth();
+
+  if (!userId) return redirect("/sign-in");
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -27,13 +32,19 @@ export default async function DashboardHomePage(props: {
           </Button>
         </Link>
       </div>
-      <BookTable search={search} />
+      <BookTable userId={userId} search={search} />
     </div>
   );
 }
 
-async function BookTable({ search }: { search?: string }) {
-  const { success, data: books } = await getAllBooks(search);
+async function BookTable({
+  userId,
+  search,
+}: {
+  userId: string;
+  search?: string;
+}) {
+  const { success, data: books } = await getAllBooks(userId, search);
   if (!success) {
     throw new Error("Failed to fetch books");
   }

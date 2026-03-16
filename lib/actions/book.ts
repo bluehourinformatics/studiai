@@ -20,38 +20,38 @@ import { TextSegment } from "../types";
 
 const utapi = new UTApi();
 
-export const getAllBooks = async (search?: string) => {
+export const getAllBooks = async (userId: string, search?: string) => {
   try {
     await connectDB();
 
-    let query = {};
+    // 1. Start with the base filter: Only books belonging to this user
+    let query: any = { clerkId: userId };
 
+    // 2. If there's a search term, use $and to combine it with the userId filter
     if (search) {
       const escapedSearch = escapeRegex(search);
       const regex = new RegExp(escapedSearch, "i");
 
       query = {
-        $or: [{ title: { $regex: regex } }, { author: { $regex: regex } }],
-      };
-
-      const books = await Book.find(query).sort({ createdAt: -1 }).lean();
-      return {
-        success: true,
-        data: serializeData(books),
+        $and: [
+          { clerkId: userId },
+          {
+            $or: [{ title: { $regex: regex } }, { author: { $regex: regex } }],
+          },
+        ],
       };
     }
 
-    const books = await Book.find();
+    // 3. Execute query with sorting
+    const books = await Book.find(query).sort({ createdAt: -1 }).lean();
+
     return {
       success: true,
       data: serializeData(books),
     };
   } catch (error) {
-    console.error("Error connecting to database", error);
-    return {
-      success: false,
-      error,
-    };
+    console.error("Error fetching books:", error);
+    return { success: false, error };
   }
 };
 
