@@ -99,7 +99,7 @@ export default function UploadForm() {
       const result = await createBook(values);
       if (!result.success) {
         console.log(result.error);
-        toast.error("Error while creating book.");
+        toast.error(result?.error as string);
         form.reset();
         setUploadDialogOpen(false);
         return;
