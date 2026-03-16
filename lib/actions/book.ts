@@ -126,6 +126,7 @@ export const createBook = async (values: CreateBookValues) => {
 
     const response = await utapi.uploadFiles(values.pdfFile);
     if (!response.data) {
+      console.error("Upload pdfFile failed.");
       return { success: false, error: "Upload failed" };
     }
 
@@ -135,6 +136,7 @@ export const createBook = async (values: CreateBookValues) => {
     if (values.coverFile) {
       const coverResp = await utapi.uploadFiles(values.coverFile);
       if (!coverResp.data) {
+        console.error("Upload coverFile failed.");
         return { success: false, error: "Upload failed" };
       }
 

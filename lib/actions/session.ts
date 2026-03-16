@@ -82,9 +82,8 @@ export async function checkPlanLimits(clerkId: string, plan: PlanLevel) {
     clerkId,
   });
 
-  console.log("bookCount: ", bookCount);
-
   if (bookCount >= config.maxBooks) {
+    console.error("Max books reached....");
     return {
       allowed: false,
       message: `Monthly limit reached (${config.maxBooks} books). Please upgrade your plan.`,
@@ -101,6 +100,7 @@ export async function checkPlanLimits(clerkId: string, plan: PlanLevel) {
   });
 
   if (sessionCount >= config.maxSessionsPerMonth) {
+    console.error("Max session per month crossed.");
     return {
       allowed: false,
       message: `Monthly limit reached (${config.maxSessionsPerMonth} sessions). Please upgrade your plan.`,
