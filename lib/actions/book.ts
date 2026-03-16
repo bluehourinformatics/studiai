@@ -15,7 +15,7 @@ import { UTApi } from "uploadthing/server";
 import { CreateBookValues, EditBookValues } from "../zod";
 import { revalidatePath } from "next/cache";
 import { PlanLevel } from "../constants";
-import { checkPlanLimits } from "./session";
+import { checkPlanBookLimits, checkPlanLimits } from "./session";
 import { TextSegment } from "../types";
 
 const utapi = new UTApi();
@@ -119,7 +119,7 @@ export const createBook = async (values: CreateBookValues) => {
 
     const plan = (user.publicMetadata.plan as PlanLevel) || "free";
     console.log("plan: ", plan);
-    const limitCheck = await checkPlanLimits(user.id, plan);
+    const limitCheck = await checkPlanBookLimits(user.id, plan);
     if (!limitCheck.allowed) {
       return { success: false, error: limitCheck.message };
     }
